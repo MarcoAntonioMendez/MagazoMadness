@@ -11,14 +11,17 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.zapatoseducadosgames.magazomadness.engine.AppConstants;
+import com.zapatoseducadosgames.magazomadness.engine.FilesHandler;
 import com.zapatoseducadosgames.magazomadness.engine.GameObject2D;
 
 public class MainActivity extends AppCompatActivity{
-    private static final int TITLE_ORIGINAL_WIDTH = 859;
-    private static final int TITLE_ORIGINAL_HEIGHT = 296;
     private RelativeLayout layout;
     private int screenWidth,screenHeight;
     private GameObject2D magazoMadnessTitle;
+    private TextView highestScoreTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +41,25 @@ public class MainActivity extends AppCompatActivity{
 
         // Setting up the Title
         int titleWidth = screenWidth-(screenWidth/10);
-        int titleHeight = (titleWidth*TITLE_ORIGINAL_HEIGHT)/TITLE_ORIGINAL_WIDTH;
+        int titleHeight = (titleWidth*AppConstants.TITLE_ORIGINAL_HEIGHT)/AppConstants.TITLE_ORIGINAL_WIDTH;
         int[] images = {R.drawable.magazo_madness_title};
         magazoMadnessTitle = new GameObject2D(this,(screenWidth/2)-(titleWidth/2),
                 (screenHeight/6)*1, titleWidth,titleHeight,images);
         layout.addView(magazoMadnessTitle);
 
+        //Setting up the score
+        setScore();
+
         hideSystemUI();
+    }
+
+    // Methods only called at the beginning
+    private void setScore(){
+        highestScoreTextView = new TextView(this);
+
+        String highestScore = FilesHandler.readFile(AppConstants.HIGHEST_SCORE_FILE_NAME,this);
+
+        layout.addView(highestScoreTextView);
     }
 
     @Override
