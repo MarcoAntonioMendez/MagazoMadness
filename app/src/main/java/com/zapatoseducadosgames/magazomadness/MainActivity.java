@@ -11,10 +11,14 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
+import com.zapatoseducadosgames.magazomadness.engine.GameObject2D;
 
 public class MainActivity extends AppCompatActivity{
+    private static final int TITLE_ORIGINAL_WIDTH = 859;
+    private static final int TITLE_ORIGINAL_HEIGHT = 296;
     private RelativeLayout layout;
     private int screenWidth,screenHeight;
+    private GameObject2D magazoMadnessTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +35,14 @@ public class MainActivity extends AppCompatActivity{
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
+
+        // Setting up the Title
+        int titleWidth = screenWidth-(screenWidth/10);
+        int titleHeight = (titleWidth*TITLE_ORIGINAL_HEIGHT)/TITLE_ORIGINAL_WIDTH;
+        int[] images = {R.drawable.magazo_madness_title};
+        magazoMadnessTitle = new GameObject2D(this,(screenWidth/2)-(titleWidth/2),
+                (screenHeight/6)*1, titleWidth,titleHeight,images);
+        layout.addView(magazoMadnessTitle);
 
         hideSystemUI();
     }
