@@ -51,6 +51,38 @@ public class MainActivity extends AppCompatActivity{
         setScore();
 
         hideSystemUI();
+        startGame();
+    }
+
+    private void startGame(){
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try{Thread.sleep(AppConstants.DELTA_TIME);}catch(InterruptedException e){e.printStackTrace();}
+                update();
+                render();
+            }
+        };
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    private void update(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
+
+    private void render(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
     }
 
     // Methods only called at the beginning
