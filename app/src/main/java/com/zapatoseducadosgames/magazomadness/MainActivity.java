@@ -21,7 +21,6 @@ public class MainActivity extends AppCompatActivity{
     private RelativeLayout layout;
     private int screenWidth,screenHeight;
     private GameObject2D magazoMadnessTitle;
-    private TextView highestScoreTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +45,6 @@ public class MainActivity extends AppCompatActivity{
         magazoMadnessTitle = new GameObject2D(this,(screenWidth/2)-(titleWidth/2),
                 (screenHeight/6)*1, titleWidth,titleHeight,images);
         layout.addView(magazoMadnessTitle);
-
-        //Setting up the score
-        setScore();
 
         hideSystemUI();
         startGame();
@@ -83,26 +79,6 @@ public class MainActivity extends AppCompatActivity{
 
             }
         });
-    }
-
-    // Methods only called at the beginning
-    private void setScore(){
-        highestScoreTextView = new TextView(this);
-
-        String highestScore = FilesHandler.readFile(AppConstants.HIGHEST_SCORE_FILE_NAME,this);
-
-        if(highestScore.isEmpty()){
-            // This means the user is playing for the first time, thus we need to create the file
-            FilesHandler.writeFile(AppConstants.HIGHEST_SCORE_FILE_NAME,"0",this);
-        }
-
-        highestScore = FilesHandler.readFile(AppConstants.HIGHEST_SCORE_FILE_NAME,this);
-        highestScoreTextView.setText(highestScore);
-        highestScoreTextView.measure(0,0);
-        highestScoreTextView.setX((screenWidth/2)-(highestScoreTextView.getMeasuredWidth()/2));
-        highestScoreTextView.setY((screenHeight/2)+highestScoreTextView.getMeasuredHeight());
-
-        layout.addView(highestScoreTextView);
     }
 
     @Override
