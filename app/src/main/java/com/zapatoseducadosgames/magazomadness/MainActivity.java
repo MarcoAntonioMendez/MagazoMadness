@@ -59,6 +59,17 @@ public class MainActivity extends AppCompatActivity{
 
         String highestScore = FilesHandler.readFile(AppConstants.HIGHEST_SCORE_FILE_NAME,this);
 
+        if(highestScore.isEmpty()){
+            // This means the user is playing for the first time, thus we need to create the file
+            FilesHandler.writeFile(AppConstants.HIGHEST_SCORE_FILE_NAME,"0",this);
+        }
+
+        highestScore = FilesHandler.readFile(AppConstants.HIGHEST_SCORE_FILE_NAME,this);
+        highestScoreTextView.setText(highestScore);
+        highestScoreTextView.measure(0,0);
+        highestScoreTextView.setX((screenWidth/2)-(highestScoreTextView.getMeasuredWidth()/2));
+        highestScoreTextView.setY((screenHeight/2)+highestScoreTextView.getMeasuredHeight());
+
         layout.addView(highestScoreTextView);
     }
 
