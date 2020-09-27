@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,9 +59,11 @@ public class MainActivity extends AppCompatActivity{
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                try{Thread.sleep(AppConstants.DELTA_TIME);}catch(InterruptedException e){e.printStackTrace();}
-                update();
-                render();
+                while(true){
+                    try{Thread.sleep(AppConstants.DELTA_TIME);}catch(InterruptedException e){e.printStackTrace();}
+                    update();
+                    render();
+                }
             }
         };
         Thread thread = new Thread(runnable);
@@ -103,10 +106,29 @@ public class MainActivity extends AppCompatActivity{
                     break;
                     default:
                         System.out.println("******** There was an error reading the game state " +
-                                " in update method **********");
+                                " in render method **********");
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent e){
+        switch(state){
+            case AppConstants.INITIAL_SCREEN_STATE:
+                state = AppConstants.GAME_STATE;
+            break;
+            case AppConstants.GAME_STATE:
+            break;
+            case AppConstants.EXPLOSION_STATE:
+            break;
+            case AppConstants.GAME_OVER_STATE:
+            break;
+            default:
+                System.out.println("******** There was an error reading the game state " +
+                        " in onTouchEvent method **********");
+        }
+        return true;
     }
 
     @Override
