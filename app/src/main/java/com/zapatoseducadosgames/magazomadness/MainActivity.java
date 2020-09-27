@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity{
     private RelativeLayout layout;
     private int screenWidth,screenHeight;
     private GameObject2D magazoMadnessTitle;
+    private String state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,9 @@ public class MainActivity extends AppCompatActivity{
                 (screenHeight/6)*1, titleWidth,titleHeight,images);
         layout.addView(magazoMadnessTitle);
 
+        // Setting the initial state
+        state = AppConstants.INITIAL_SCREEN_STATE;
+
         hideSystemUI();
         startGame();
     }
@@ -67,7 +71,19 @@ public class MainActivity extends AppCompatActivity{
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
+                switch(state){
+                    case AppConstants.INITIAL_SCREEN_STATE:
+                    break;
+                    case AppConstants.GAME_STATE:
+                    break;
+                    case AppConstants.EXPLOSION_STATE:
+                    break;
+                    case AppConstants.GAME_OVER_STATE:
+                    break;
+                    default:
+                        System.out.println("******** There was an error reading the game state " +
+                                " in update method **********");
+                }
             }
         });
     }
@@ -76,7 +92,19 @@ public class MainActivity extends AppCompatActivity{
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
+                switch(state){
+                    case AppConstants.INITIAL_SCREEN_STATE:
+                    break;
+                    case AppConstants.GAME_STATE:
+                    break;
+                    case AppConstants.EXPLOSION_STATE:
+                    break;
+                    case AppConstants.GAME_OVER_STATE:
+                    break;
+                    default:
+                        System.out.println("******** There was an error reading the game state " +
+                                " in update method **********");
+                }
             }
         });
     }
