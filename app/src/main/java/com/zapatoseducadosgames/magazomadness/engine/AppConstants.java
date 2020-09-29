@@ -9,4 +9,11 @@ public class AppConstants {
     public static final String GAME_STATE = "GAME_STATE";
     public static final String EXPLOSION_STATE = "EXPLOSION_STATE";
     public static final String GAME_OVER_STATE = "GAME_OVER_STATE";
+
+    public static final int NEW_CITY_BLOCK_TIME_INTERVAL = 10000;
+
+    public static final String DARK_WET_BUILDING = "DARK_WET_BUILDING";
+    public static final String DARK_WET_BUILDING_BASE = "DARK_WET_BUILDING_BASE" ;
+    public static final String DARK_WET_BUILDING_HALF = "DARK_WET_BUILDING_HALF";
+    public static final String DARK_WET_BUILDING_TOP = "DARK_WET_BUILDING_TOP";
 }

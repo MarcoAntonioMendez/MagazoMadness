@@ -17,12 +17,14 @@ import android.widget.TextView;
 import com.zapatoseducadosgames.magazomadness.engine.AppConstants;
 import com.zapatoseducadosgames.magazomadness.engine.FilesHandler;
 import com.zapatoseducadosgames.magazomadness.engine.GameObject2D;
+import com.zapatoseducadosgames.magazomadness.engine.GameScreenManager;
 
 public class MainActivity extends AppCompatActivity{
     private RelativeLayout layout;
     private int screenWidth,screenHeight;
     private GameObject2D magazoMadnessTitle;
     private String state;
+    private GameScreenManager gameScreenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,9 @@ public class MainActivity extends AppCompatActivity{
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
+
+        // Setting up the managers for each game state
+        gameScreenManager = new GameScreenManager(screenWidth,screenHeight,this,layout);
 
         // Setting up the Title
         int titleWidth = screenWidth-(screenWidth/10);
@@ -78,6 +83,7 @@ public class MainActivity extends AppCompatActivity{
                     case AppConstants.INITIAL_SCREEN_STATE:
                     break;
                     case AppConstants.GAME_STATE:
+                        gameScreenManager.update();
                     break;
                     case AppConstants.EXPLOSION_STATE:
                     break;
@@ -117,6 +123,7 @@ public class MainActivity extends AppCompatActivity{
         switch(state){
             case AppConstants.INITIAL_SCREEN_STATE:
                 state = AppConstants.GAME_STATE;
+                gameScreenManager.setArchitectureStyle();
             break;
             case AppConstants.GAME_STATE:
             break;
