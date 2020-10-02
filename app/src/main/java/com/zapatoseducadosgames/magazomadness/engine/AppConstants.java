@@ -13,4 +13,7 @@ public class AppConstants {
     public static final int NEW_CITY_BLOCK_TIME_INTERVAL = 10000;
 
     public static final String DARK_WET_BUILDING = "DARK_WET_BUILDING";
+
+    public static final int ORIGINAL_SCREEN_WIDTH = 1080;
+    public static final int ORIGINAL_SCREEN_HEIGHT = 2131;
 }

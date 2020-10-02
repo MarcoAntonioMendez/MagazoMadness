@@ -1,24 +1,72 @@
 package com.zapatoseducadosgames.magazomadness.engine;
 
 import android.content.Context;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class GameScreenManager {
+    // Phase 1 lasts for 10 seconds
+    public static final int PHASE_1_LENGTH = 10000;
+    public static final int PHASE_1_TIME_STAMP = 10000;
+    public static final int PHASE_1_INTERVAL = 2000;
+    //Phase 2 lasts for 10 seconds
+    public static final int PHASE_2_LENGTH = 10000;
+    public static final int PHASE_2_TIME_STAMP = 20000;
+    public static final int PHASE_2_INTERVAL = 1000;
+    //Phase 3 lasts for 13 seconds
+    public static final int PHASE_3_LENGTH = 13000;
+    public static final int PHASE_3_TIME_STAMP = 33000;
+    public static final int PHASE_3_INTERVAL = 900;
+    //Phase 4 lasts for 10 seconds
+    public static final int PHASE_4_LENGTH = 10000;
+    public static final int PHASE_4_TIME_STAMP = 43000;
+    public static final int PHASE_4_INTERVAL = 800;
+    //Phase 5 lasts for 10 seconds
+    public static final int PHASE_5_LENGTH = 10000;
+    public static final int PHASE_5_TIME_STAMP = 53000;
+    public static final int PHASE_5_INTERVAL = 700;
+    //Phase 6 lasts for 30 seconds
+    public static final int PHASE_6_LENGTH = 30000;
+    public static final int PHASE_6_TIME_STAMP = 63000;
+    public static final int PHASE_6_INTERVAL = 600;
+    //Phase 7 lasts for 30 seconds
+    public static final int PHASE_7_LENGTH = 30000;
+    public static final int PHASE_7_TIME_STAMP = 93000;
+    public static final int PHASE_7_INTERVAL = 500;
+    //Phase 8 lasts for 30 seconds
+    public static final int PHASE_8_LENGTH = 30000;
+    public static final int PHASE_8_TIME_STAMP = 123000;
+    public static final int PHASE_8_INTERVAL = 400;
+    // Variables
     private String architectureStyle;
     private String[] allArchitectureStyles = {AppConstants.DARK_WET_BUILDING};
     private Random random;
     private City city;
-    private int secondsPassed;
+    private int secondsPassed,screenWidth,screenHeight,timePassedForMeteors,currentWave;
     private RelativeLayout layout;
+    private Context context;
+    private ArrayList<Integer> timeStampsForWave;
+    private ArrayList<Meteor> meteors;
 
     public GameScreenManager(int screenWidth,int screenHeight,Context context,RelativeLayout layout){
         architectureStyle = AppConstants.DARK_WET_BUILDING;
         this.layout = layout;
+        this.screenWidth = screenWidth;
+        this.screenHeight = screenHeight;
+        this.context = context;
 
         city = new City(screenWidth,screenHeight,context);
         secondsPassed = 0;
+        timePassedForMeteors = 0;
+        currentWave = 0;
+
+        // Setting the meteors
+        meteors = new ArrayList<Meteor>();
+        setMeteorsWaves();
 
         random = new Random();
     }
@@ -35,8 +83,25 @@ public class GameScreenManager {
      */
     public void update(){
         secondsPassed += AppConstants.DELTA_TIME;
+        timePassedForMeteors += AppConstants.DELTA_TIME;
 
+        dispatchMeteors();
         addCityBlock();
+
+        // Updating the meteors, making go down down down down
+        for(int x = 0; x < meteors.size(); x++){
+            meteors.get(x).update(screenWidth);
+        }
+
+        // Checking if user killed the meteor
+        for(int x = 0; x < meteors.size(); x++){
+            if(meteors.get(x).isDeath()){
+                meteors.get(x).setVisibility(View.INVISIBLE);
+                meteors.remove(x);
+                x--;
+                break;
+            }
+        }
     }
 
     public void render(){}
@@ -62,6 +127,108 @@ public class GameScreenManager {
                         architectureStyle);
                 layout.addView(newCityBlock);
             }
+        }
+    }
+
+    private void dispatchMeteors(){
+        if(currentWave < timeStampsForWave.size()){
+            if(timePassedForMeteors >= timeStampsForWave.get(currentWave)){
+                dispatchWave(currentWave);
+                timePassedForMeteors = 0;
+                currentWave++;
+            }
+        }else{
+            if(timePassedForMeteors >= timeStampsForWave.get((currentWave-1))){
+                dispatchWave((currentWave-1));
+                timePassedForMeteors = 0;
+            }
+        }
+
+    }
+
+    private void dispatchWave(int x){
+        int numberOfMeteors;
+        if(secondsPassed < PHASE_1_TIME_STAMP){
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.SMALL_SIZE,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else if(secondsPassed < PHASE_2_TIME_STAMP){
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.SMALL_SIZE,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else if(secondsPassed < PHASE_3_TIME_STAMP){
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else if(secondsPassed < PHASE_4_TIME_STAMP){
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else if(secondsPassed < PHASE_5_TIME_STAMP){
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else if(secondsPassed < PHASE_6_TIME_STAMP){
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else if(secondsPassed < PHASE_7_TIME_STAMP){
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else if(secondsPassed < PHASE_8_TIME_STAMP){
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }else{
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+                    Meteor.choosePosition());
+        }
+    }
+
+    private void createMeteor(String movement,int size,int velocity,int second,int position){
+        final Meteor meteor = new Meteor(context,movement,size,velocity,second,position,
+                screenWidth,screenHeight);
+        meteor.setOnTouchListener(new View.OnTouchListener(){
+            public boolean onTouch(View v,MotionEvent event){
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    meteor.receiveAttack();
+                }
+
+                return true;
+            }
+        });
+        meteors.add(meteor);
+        layout.addView(meteor);
+    }
+
+    // Methods only called in the constructor
+    private void setMeteorsWaves(){
+        timeStampsForWave = new ArrayList<Integer>();
+
+        //Phase 1
+        for(int x = 0; x < PHASE_1_LENGTH/PHASE_1_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_1_INTERVAL);
+        }
+        //Phase 2
+        for(int x = 0; x < PHASE_2_LENGTH/PHASE_2_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_2_INTERVAL);
+        }
+        //Phase 3
+        for(int x = 0; x < PHASE_3_LENGTH/PHASE_3_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_3_INTERVAL);
+        }
+        //Phase 4
+        for(int x = 0; x < PHASE_4_LENGTH/PHASE_4_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_4_INTERVAL);
+        }
+        //Phase 5
+        for(int x = 0; x < PHASE_5_LENGTH/PHASE_5_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_5_INTERVAL);
+        }
+        //Phase 6
+        for(int x = 0; x < PHASE_6_LENGTH/PHASE_6_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_6_INTERVAL);
+        }
+        //Phase 7
+        for(int x = 0; x < PHASE_7_LENGTH/PHASE_7_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_7_INTERVAL);
+        }
+        //Phase 8
+        for(int x = 0; x < PHASE_8_LENGTH/PHASE_8_INTERVAL; x++){
+            timeStampsForWave.add(PHASE_8_INTERVAL);
         }
     }
 }
