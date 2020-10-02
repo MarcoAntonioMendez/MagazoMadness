@@ -142,6 +142,9 @@ public class GameScreenManager {
         }
     }
 
+    /**
+     * Checks if another meteor should be added.
+     */
     private void dispatchMeteors(){
         if(currentWave < timeStampsForWave.size()){
             if(timePassedForMeteors >= timeStampsForWave.get(currentWave)){
@@ -158,40 +161,49 @@ public class GameScreenManager {
 
     }
 
+    /**
+     * According to the current difficulty of the game (PHASE), it calls the method createMeteor()
+     */
     private void dispatchWave(int x){
-        int numberOfMeteors;
         if(secondsPassed < PHASE_1_TIME_STAMP){
-            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.SMALL_SIZE,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.SMALL_SIZE,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else if(secondsPassed < PHASE_2_TIME_STAMP){
-            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.SMALL_SIZE,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.SMALL_SIZE,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else if(secondsPassed < PHASE_3_TIME_STAMP){
-            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.chooseSize() ,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else if(secondsPassed < PHASE_4_TIME_STAMP){
-            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.VERTICAL_MOVEMENT,Meteor.chooseSize() ,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else if(secondsPassed < PHASE_5_TIME_STAMP){
-            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else if(secondsPassed < PHASE_6_TIME_STAMP){
-            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else if(secondsPassed < PHASE_7_TIME_STAMP){
-            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else if(secondsPassed < PHASE_8_TIME_STAMP){
-            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }else{
-            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),0,
+            createMeteor(Meteor.chooseMovement(),Meteor.chooseSize() ,Meteor.chooseVelocity(),
                     Meteor.choosePosition());
         }
     }
 
-    private void createMeteor(String movement,int size,int velocity,int second,int position){
-        final Meteor meteor = new Meteor(context,movement,size,velocity,second,position,
+    /**
+     * Creates a meteor and adds it to the layout
+     * @param movement - Movement of the meteor (SIN, VERTICAL etc.):
+     * @param size - Size of the meteor (3,2,1).
+     * @param velocity - Velocity of the meteor, how fast it will go down.
+     * @param position - Position of depending of screen width.
+     */
+    private void createMeteor(String movement,int size,int velocity,int position){
+        final Meteor meteor = new Meteor(context,movement,size,velocity,position,
                 screenWidth,screenHeight);
         meteor.setOnTouchListener(new View.OnTouchListener(){
             public boolean onTouch(View v,MotionEvent event){

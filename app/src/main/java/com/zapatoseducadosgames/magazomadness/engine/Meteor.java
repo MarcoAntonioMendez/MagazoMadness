@@ -47,7 +47,7 @@ public class Meteor extends AppCompatImageView {
     public static final int MAX_POSSIBLE_POSITIONS = 7;
 
     // Variables
-    private int meteorWidth,meteorHeight,secondOfAppearance,size,calculatedIncrement;
+    private int meteorWidth,meteorHeight,size,calculatedIncrement;
     private float meteorXPos,meteorYPos,xVelocity,yVelocity,appearancePosition,degrees;
     private float degreesIncrement,amplitude,maxDegrees;
     private String movement;
@@ -55,8 +55,7 @@ public class Meteor extends AppCompatImageView {
 
 
     public Meteor(Context context,String movement,int size,
-                  int velocity,int secondOfAppearance,
-                  int position,int screenWidth,int screenHeight){
+                  int velocity, int position,int screenWidth,int screenHeight){
         super(context);
         isActive = false;
         isDeath = false;
@@ -80,9 +79,6 @@ public class Meteor extends AppCompatImageView {
 
         // The meteor could BE SLOW, MEDIUM, FAST OR VERY FAST
         setVelocity(velocity,screenHeight,screenWidth);
-
-        // Setting the second in which the meteor will appear
-        this.secondOfAppearance = secondOfAppearance;
 
         // Setting the position
         setPosition(position,screenWidth);
