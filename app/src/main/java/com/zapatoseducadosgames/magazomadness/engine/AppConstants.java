@@ -13,7 +13,4 @@ public class AppConstants {
     public static final int NEW_CITY_BLOCK_TIME_INTERVAL = 10000;
 
     public static final String DARK_WET_BUILDING = "DARK_WET_BUILDING";
-    public static final String DARK_WET_BUILDING_BASE = "DARK_WET_BUILDING_BASE" ;
-    public static final String DARK_WET_BUILDING_HALF = "DARK_WET_BUILDING_HALF";
-    public static final String DARK_WET_BUILDING_TOP = "DARK_WET_BUILDING_TOP";
 }
