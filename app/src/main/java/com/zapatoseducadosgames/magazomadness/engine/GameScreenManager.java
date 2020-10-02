@@ -93,6 +93,18 @@ public class GameScreenManager {
             meteors.get(x).update(screenWidth);
         }
 
+        // Checking if any meteor collisions with a city block
+        for(int x = 0; x < city.getCity().size(); x++){
+            for(int y = 0; y < meteors.size(); y++){
+                if(meteors.get(y).onCollision(city.getCity().get(x))){
+                    meteors.get(y).setVisibility(View.INVISIBLE);
+                    meteors.remove(y);
+                    y--;
+                    break;
+                }
+            }
+        }
+
         // Checking if user killed the meteor
         for(int x = 0; x < meteors.size(); x++){
             if(meteors.get(x).isDeath()){
