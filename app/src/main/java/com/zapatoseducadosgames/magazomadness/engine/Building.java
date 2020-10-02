@@ -18,8 +18,16 @@ public class Building extends AppCompatImageView {
     private float xPos,yPos;
     private int buildingWidth,buildingHeight,screenWidth,screenHeight;
 
+    /**
+     * In the constructor, the specific sprites are set.
+     * @param context - Context for View
+     * @param building - Contains the architecture style.
+     * @param verticalPosition - Indicates the height of the cityBlock, so we can choose between
+     *                         base, middle or top
+     */
     public Building(Context context,String building,int verticalPosition){
         super(context);
+
         if(building.equals(AppConstants.DARK_WET_BUILDING)){
             if(verticalPosition == 1){//This means the base of the building id being created.
                 setImageResource(R.drawable.dark_wet_building_base);
@@ -31,11 +39,21 @@ public class Building extends AppCompatImageView {
         }
     }
 
+    /**
+     * Sets the screenWidth and the screenHeight of the Android device being used
+     * @param screenWidth - Integer, screenWidth
+     * @param screenHeight - Integer, screenHeight
+     */
     public void setScreenWidthAndHeight(int screenWidth,int screenHeight){
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
     }
 
+    /**
+     * Sets the width and height of the cityBlocks
+     * @param buildingWidth - Integer, building width
+     * @param buildingHeight - Integer, building height
+     */
     private void setBuildingWidthAndHeight(int buildingWidth,int buildingHeight){
         this.requestLayout();
         this.buildingWidth = buildingWidth;
@@ -44,6 +62,13 @@ public class Building extends AppCompatImageView {
         this.setScaleType(ImageView.ScaleType.FIT_XY);
     }
 
+    /**
+     * Sets the x and y coordinates of the cityBlock taking in consideration the vertical and
+     * horizontal positions.
+     * @param horizontalPosition - CityBlock horizontal position.
+     * @param verticalHeight - CityBlock vertical position.
+     * @param screenHeight - Screen height of the Android device being used.
+     */
     public void setCoordinates(int horizontalPosition,int verticalHeight,float screenHeight){
         float cityHeight = screenHeight-(screenHeight/2);
         float cityIndividualLevel = cityHeight/CITY_MAX_LEVELS;

@@ -31,6 +31,13 @@ public class City {
         }
     }
 
+    /**
+     * Creates City block
+     * @param horizontalPosition - The horizontal position in which the cityBlock will be placed.
+     * @param verticalPosition - The height in which the cityBlock will be placed.
+     * @param type - Architecture style.
+     * @return - The object og cityBlock to be added to layout
+     */
     public Building createCityBlock(int horizontalPosition,int verticalPosition,String type){
         // Creating the cityBlock
         Building cityBlock = new Building(context,type,verticalPosition);
@@ -51,6 +58,12 @@ public class City {
         return random.nextInt(CITY_WIDTH);
     }
 
+    /**
+     * Given a horizontal position, it will choose a vertical position according to the next
+     * vertical position in turn, without causing any overriding or bad data.
+     * @param horizontalPosition - Horizontal position in which the cityBlock will be placed.
+     * @return An integer representing the vertical position of the cityBlock,
+     */
     public int chooseVerticalPosition(int horizontalPosition){
         for(int x = 0; x < CITY_HEIGHT; x++){
             if(cityStructure[horizontalPosition][x]){
@@ -64,6 +77,10 @@ public class City {
         return -1;
     }
 
+    /**
+     * Gets the city thah contains all the buildings, also called the cityBlocks
+     * @return ArrayList of Buildings
+     */
     public ArrayList<Building> getCity(){
         return city;
     }

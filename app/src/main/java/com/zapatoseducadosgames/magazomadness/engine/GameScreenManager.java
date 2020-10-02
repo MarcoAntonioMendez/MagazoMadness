@@ -30,6 +30,9 @@ public class GameScreenManager {
         architectureStyle = allArchitectureStyles[random.nextInt(allArchitectureStyles.length)];
     }
 
+    /**
+     * Updates all objects that are active during the game state
+     */
     public void update(){
         secondsPassed += AppConstants.DELTA_TIME;
 
@@ -42,10 +45,8 @@ public class GameScreenManager {
             cityBlockHorizontalPosition = city.chooseHorizontalPosition();
             cityBlockVerticalPosition = city.chooseVerticalPosition(cityBlockHorizontalPosition);
 
-            System.out.println("Horizontal: " + cityBlockHorizontalPosition);
-            System.out.println("Vertical: " + cityBlockVerticalPosition);
-
             // Creating the cityBlock
+            // If cityBlockVerticalPosition is -1, it means the tower is full
             if(cityBlockVerticalPosition != -1){
                 newCityBlock = city.createCityBlock(cityBlockHorizontalPosition+1,
                         City.CITY_HEIGHT-cityBlockVerticalPosition,
@@ -54,4 +55,6 @@ public class GameScreenManager {
             }
         }
     }
+
+    public void render(){}
 }
