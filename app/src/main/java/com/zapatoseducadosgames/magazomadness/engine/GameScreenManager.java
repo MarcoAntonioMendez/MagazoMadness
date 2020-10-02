@@ -36,6 +36,15 @@ public class GameScreenManager {
     public void update(){
         secondsPassed += AppConstants.DELTA_TIME;
 
+        addCityBlock();
+    }
+
+    public void render(){}
+
+    /**
+     * Checks if a new city block should be added.
+     */
+    private void addCityBlock(){
         int newCityBlockTimeStamp = city.getCity().size()*AppConstants.NEW_CITY_BLOCK_TIME_INTERVAL;
         int cityBlockHorizontalPosition,cityBlockVerticalPosition;
         Building newCityBlock = null;
@@ -55,6 +64,4 @@ public class GameScreenManager {
             }
         }
     }
-
-    public void render(){}
 }
