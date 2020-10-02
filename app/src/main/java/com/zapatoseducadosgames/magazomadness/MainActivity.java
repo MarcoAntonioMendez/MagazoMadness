@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity{
         switch(state){
             case AppConstants.INITIAL_SCREEN_STATE:
                 state = AppConstants.GAME_STATE;
+                magazoMadnessTitle.setVisibility(View.INVISIBLE);
                 gameScreenManager.setArchitectureStyle();
             break;
             case AppConstants.GAME_STATE:
