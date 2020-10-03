@@ -84,4 +84,17 @@ public class City {
     public ArrayList<Building> getCity(){
         return city;
     }
+
+    /**
+     * Resets the city 2D-array structure for a new game.
+     */
+    public void reset(){
+        for(int x = 0; x < CITY_WIDTH; x++){
+            for(int y = 0; y < CITY_HEIGHT; y++){
+                cityStructure[x][y] = false;
+            }
+        }
+
+        city.removeAll(city);
+    }
 }

@@ -116,6 +116,7 @@ public class GameScreenManager {
         }else{
             explosionTime += AppConstants.DELTA_TIME;
             if(explosionTime >= TIME_DESIGNATED_FOR_EXPLOSIONS){
+                reset();
                 return AppConstants.GAME_OVER_STATE;
             }
         }
@@ -248,6 +249,31 @@ public class GameScreenManager {
         });
         meteors.add(meteor);
         layout.addView(meteor);
+    }
+
+    /**
+     * Deletes all the objects active in the game state so memory can be freed.
+     */
+    private void reset(){
+        anyMeteorHasHitCityBlock = false;
+        explosionTime = 0;
+        secondsPassed = 0;
+        timePassedForMeteors = 0;
+        currentWave = 0;
+
+        for(int x = 0; x < meteors.size(); x++){
+            layout.removeView(meteors.get(x));
+        }
+        meteors.removeAll(meteors);
+
+        for(int x = 0; x < city.getCity().size(); x++){
+            layout.removeView(city.getCity().get(x));
+        }
+
+        layout.removeView(explosionObject);
+        explosionObject = null;
+
+        city.reset();
     }
 
     // Methods only called in the constructor
