@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity{
                     case AppConstants.INITIAL_SCREEN_STATE:
                     break;
                     case AppConstants.GAME_STATE:
-                        gameScreenManager.update();
+                        state = gameScreenManager.update();
                     break;
                     case AppConstants.EXPLOSION_STATE:
                     break;

@@ -5,11 +5,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.zapatoseducadosgames.magazomadness.R;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class GameScreenManager {
+    public static final int TIME_DESIGNATED_FOR_EXPLOSIONS = 4000;
     // Phase 1 lasts for 10 seconds
     public static final int PHASE_1_LENGTH = 10000;
     public static final int PHASE_1_TIME_STAMP = 10000;
@@ -47,11 +50,13 @@ public class GameScreenManager {
     private String[] allArchitectureStyles = {AppConstants.DARK_WET_BUILDING};
     private Random random;
     private City city;
-    private int secondsPassed,screenWidth,screenHeight,timePassedForMeteors,currentWave;
+    private int secondsPassed,screenWidth,screenHeight,timePassedForMeteors,currentWave,explosionTime;
     private RelativeLayout layout;
     private Context context;
     private ArrayList<Integer> timeStampsForWave;
     private ArrayList<Meteor> meteors;
+    private boolean anyMeteorHasHitCityBlock;
+    private GameObject2D explosionObject;
 
     public GameScreenManager(int screenWidth,int screenHeight,Context context,RelativeLayout layout){
         architectureStyle = AppConstants.DARK_WET_BUILDING;
@@ -59,6 +64,8 @@ public class GameScreenManager {
         this.screenWidth = screenWidth;
         this.screenHeight = screenHeight;
         this.context = context;
+        anyMeteorHasHitCityBlock = false;
+        explosionTime = 0;
 
         city = new City(screenWidth,screenHeight,context);
         secondsPassed = 0;
@@ -82,29 +89,38 @@ public class GameScreenManager {
     /**
      * Updates all objects that are active during the game state
      */
-    public void update(){
+    public String update(){
         secondsPassed += AppConstants.DELTA_TIME;
         timePassedForMeteors += AppConstants.DELTA_TIME;
 
-        dispatchMeteors();
-        addCityBlock();
+        if(!anyMeteorHasHitCityBlock) {
+            dispatchMeteors();
+            addCityBlock();
 
-        // Updating the meteors, making go down down down down
-        for(int x = 0; x < meteors.size(); x++){
-            meteors.get(x).update(screenWidth);
-        }
+            // Updating the meteors, making go down down down down
+            for(int x = 0; x < meteors.size(); x++){
+                meteors.get(x).update(screenWidth);
+            }
 
-        checkIfAnyMeteorsHitAnyCityBlock();
+            checkIfAnyMeteorsHitAnyCityBlock();
 
-        // Checking if user killed the meteor
-        for(int x = 0; x < meteors.size(); x++){
-            if(meteors.get(x).isDeath()){
-                meteors.get(x).setVisibility(View.INVISIBLE);
-                meteors.remove(x);
-                x--;
-                break;
+            // Checking if user killed the meteor
+            for(int x = 0; x < meteors.size(); x++){
+                if(meteors.get(x).isDeath()){
+                    meteors.get(x).setVisibility(View.INVISIBLE);
+                    meteors.remove(x);
+                    x--;
+                    break;
+                }
+            }
+        }else{
+            explosionTime += AppConstants.DELTA_TIME;
+            if(explosionTime >= TIME_DESIGNATED_FOR_EXPLOSIONS){
+                return AppConstants.GAME_OVER_STATE;
             }
         }
+
+        return AppConstants.GAME_STATE;
     }
 
     public void render(){}
@@ -116,7 +132,14 @@ public class GameScreenManager {
         for(int x = 0; x < city.getCity().size(); x++){
             for(int y = 0; y < meteors.size(); y++){
                 if(meteors.get(y).onCollision(city.getCity().get(x))){
+                    anyMeteorHasHitCityBlock = true;
                     meteors.get(y).setVisibility(View.INVISIBLE);
+
+                    int[] explosionImages = {R.drawable.explosion};
+                    explosionObject = new GameObject2D(context,meteors.get(y).getMeteorXPos(),
+                            meteors.get(y).getMeteorYPos(),meteors.get(y).getMeteorWidth(),
+                            meteors.get(y).getMeteorHeight(),explosionImages);
+                    layout.addView(explosionObject);
                     meteors.remove(y);
                     y--;
                     break;
