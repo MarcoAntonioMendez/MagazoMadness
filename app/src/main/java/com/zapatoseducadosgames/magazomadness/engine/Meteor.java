@@ -94,6 +94,12 @@ public class Meteor extends AppCompatImageView {
         if(size == 0){
             isDeath = true;
         }
+
+        if(size == MEDIUM_SIZE){
+            setImageResource(R.drawable.bad_entity_2);
+        }else if(size == SMALL_SIZE){
+            setImageResource(R.drawable.bad_entity_1);
+        }
     }
 
     public boolean isDeath(){

@@ -238,7 +238,9 @@ public class GameScreenManager {
         meteor.setOnTouchListener(new View.OnTouchListener(){
             public boolean onTouch(View v,MotionEvent event){
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
-                    meteor.receiveAttack();
+                    if(!anyMeteorHasHitCityBlock){
+                        meteor.receiveAttack();
+                    }
                 }
 
                 return true;
