@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class GameScreenManager {
@@ -93,17 +94,7 @@ public class GameScreenManager {
             meteors.get(x).update(screenWidth);
         }
 
-        // Checking if any meteor collisions with a city block
-        for(int x = 0; x < city.getCity().size(); x++){
-            for(int y = 0; y < meteors.size(); y++){
-                if(meteors.get(y).onCollision(city.getCity().get(x))){
-                    meteors.get(y).setVisibility(View.INVISIBLE);
-                    meteors.remove(y);
-                    y--;
-                    break;
-                }
-            }
-        }
+        checkIfAnyMeteorsHitAnyCityBlock();
 
         // Checking if user killed the meteor
         for(int x = 0; x < meteors.size(); x++){
@@ -117,6 +108,22 @@ public class GameScreenManager {
     }
 
     public void render(){}
+
+    /**
+     * Checks if any meteor hits the top of cityBlocks
+     */
+    private void checkIfAnyMeteorsHitAnyCityBlock(){
+        for(int x = 0; x < city.getCity().size(); x++){
+            for(int y = 0; y < meteors.size(); y++){
+                if(meteors.get(y).onCollision(city.getCity().get(x))){
+                    meteors.get(y).setVisibility(View.INVISIBLE);
+                    meteors.remove(y);
+                    y--;
+                    break;
+                }
+            }
+        }
+    }
 
     /**
      * Checks if a new city block should be added.
