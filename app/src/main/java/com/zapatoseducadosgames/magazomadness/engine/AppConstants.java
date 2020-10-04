@@ -5,6 +5,9 @@ public class AppConstants {
     public static final int TITLE_ORIGINAL_HEIGHT = 296;
     public static final int DELTA_TIME = 42;
     public static final String HIGHEST_SCORE_FILE_NAME = "HIGHEST_SCORE_FILE_NAME";
+    public static final int HIGHEST_SCORE_TEXT_SIZE = 20;
+    public static final String HIGHEST_SCORE_TEXT_COLOR = "#b00006";
+
 
     public static final String INITIAL_SCREEN_STATE = "INITIAL_SCREEN_STATE";
     public static final String GAME_STATE = "GAME_STATE";

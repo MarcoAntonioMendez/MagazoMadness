@@ -1,6 +1,8 @@
 package com.zapatoseducadosgames.magazomadness;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -155,6 +157,9 @@ public class MainActivity extends AppCompatActivity{
 
         highestScoreView = new TextView(this);
         highestScoreView.setText(highestScoreStr);
+        highestScoreView.setTypeface(Typeface.SANS_SERIF);
+        highestScoreView.setTextSize(AppConstants.HIGHEST_SCORE_TEXT_SIZE);
+        highestScoreView.setTextColor(Color.parseColor(AppConstants.HIGHEST_SCORE_TEXT_COLOR));
         highestScoreView.measure(0,0);
         highestScoreView.setX((screenWidth/2)-(highestScoreView.getMeasuredWidth()/2));
         highestScoreView.setY((screenHeight/2)-(highestScoreView.getMeasuredHeight()/2));
