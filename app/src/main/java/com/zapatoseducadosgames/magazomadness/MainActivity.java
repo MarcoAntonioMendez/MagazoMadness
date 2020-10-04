@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity{
     private RelativeLayout layout;
     private int screenWidth,screenHeight;
     private GameObject2D magazoMadnessTitle;
-    private String state;
+    private TextView highestScoreView;
+    private String state,highestScoreStr;
     private GameScreenManager gameScreenManager;
 
     @Override
@@ -55,6 +56,9 @@ public class MainActivity extends AppCompatActivity{
 
         // Setting the initial state
         state = AppConstants.INITIAL_SCREEN_STATE;
+
+        // Set up the files
+        setHighestScore();
 
         hideSystemUI();
         startGame();
@@ -124,7 +128,9 @@ public class MainActivity extends AppCompatActivity{
             case AppConstants.INITIAL_SCREEN_STATE:
                 state = AppConstants.GAME_STATE;
                 magazoMadnessTitle.setVisibility(View.INVISIBLE);
+                highestScoreView.setVisibility(View.INVISIBLE);
                 gameScreenManager.setArchitectureStyle();
+                gameScreenManager.setHighestScore(highestScoreStr);
             break;
             case AppConstants.GAME_STATE:
             break;
@@ -137,6 +143,23 @@ public class MainActivity extends AppCompatActivity{
                         " in onTouchEvent method **********");
         }
         return true;
+    }
+
+    private void setHighestScore(){
+        highestScoreStr = FilesHandler.readFile(AppConstants.HIGHEST_SCORE_FILE_NAME,this);
+
+        if(highestScoreStr.isEmpty()){
+            FilesHandler.writeFile(AppConstants.HIGHEST_SCORE_FILE_NAME,"0",this);
+            highestScoreStr = "0";
+        }
+
+        highestScoreView = new TextView(this);
+        highestScoreView.setText(highestScoreStr);
+        highestScoreView.measure(0,0);
+        highestScoreView.setX((screenWidth/2)-(highestScoreView.getMeasuredWidth()/2));
+        highestScoreView.setY((screenHeight/2)-(highestScoreView.getMeasuredHeight()/2));
+
+        layout.addView(highestScoreView);
     }
 
     @Override

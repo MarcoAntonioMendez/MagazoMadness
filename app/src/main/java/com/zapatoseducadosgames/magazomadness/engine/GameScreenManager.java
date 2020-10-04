@@ -51,6 +51,8 @@ public class GameScreenManager {
     private Random random;
     private City city;
     private int secondsPassed,screenWidth,screenHeight,timePassedForMeteors,currentWave,explosionTime;
+    private int score;
+    private String highestScore;
     private RelativeLayout layout;
     private Context context;
     private ArrayList<Integer> timeStampsForWave;
@@ -66,6 +68,7 @@ public class GameScreenManager {
         this.context = context;
         anyMeteorHasHitCityBlock = false;
         explosionTime = 0;
+        score = 0;
 
         city = new City(screenWidth,screenHeight,context);
         secondsPassed = 0;
@@ -116,6 +119,10 @@ public class GameScreenManager {
         }else{
             explosionTime += AppConstants.DELTA_TIME;
             if(explosionTime >= TIME_DESIGNATED_FOR_EXPLOSIONS){
+                if(score > Integer.valueOf(highestScore)){
+                    FilesHandler.writeFile(AppConstants.HIGHEST_SCORE_FILE_NAME,
+                            String.valueOf(score),context);
+                }
                 reset();
                 return AppConstants.GAME_OVER_STATE;
             }
@@ -240,6 +247,7 @@ public class GameScreenManager {
             public boolean onTouch(View v,MotionEvent event){
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
                     if(!anyMeteorHasHitCityBlock){
+                        score += 1;
                         meteor.receiveAttack();
                     }
                 }
@@ -260,6 +268,7 @@ public class GameScreenManager {
         secondsPassed = 0;
         timePassedForMeteors = 0;
         currentWave = 0;
+        score = 0;
 
         for(int x = 0; x < meteors.size(); x++){
             layout.removeView(meteors.get(x));
@@ -274,6 +283,10 @@ public class GameScreenManager {
         explosionObject = null;
 
         city.reset();
+    }
+
+    public void setHighestScore(String highestScore){
+        this.highestScore = highestScore;
     }
 
     // Methods only called in the constructor
