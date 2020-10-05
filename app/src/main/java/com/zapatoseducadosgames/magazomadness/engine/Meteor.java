@@ -1,8 +1,8 @@
 package com.zapatoseducadosgames.magazomadness.engine;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatImageView;
-import android.view.View;
+import androidx.appcompat.widget.AppCompatImageView;
+
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 

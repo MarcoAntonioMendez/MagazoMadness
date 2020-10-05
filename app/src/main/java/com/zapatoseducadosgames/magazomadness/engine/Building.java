@@ -1,11 +1,9 @@
 package com.zapatoseducadosgames.magazomadness.engine;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.support.v7.widget.AppCompatImageView;
+
+import androidx.appcompat.widget.AppCompatImageView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.zapatoseducadosgames.magazomadness.R;

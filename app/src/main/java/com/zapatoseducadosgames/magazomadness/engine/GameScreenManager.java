@@ -1,15 +1,22 @@
 package com.zapatoseducadosgames.magazomadness.engine;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.RewardedAdCallback;
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.zapatoseducadosgames.magazomadness.R;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+
+import androidx.annotation.NonNull;
 
 public class GameScreenManager {
     public static final int TIME_DESIGNATED_FOR_EXPLOSIONS = 4000;
@@ -57,10 +64,13 @@ public class GameScreenManager {
     private Context context;
     private ArrayList<Integer> timeStampsForWave;
     private ArrayList<Meteor> meteors;
-    private boolean anyMeteorHasHitCityBlock;
-    private GameObject2D explosionObject;
+    private boolean anyMeteorHasHitCityBlock,userAlreadyUsedContinue,watchAdQuestionSet,watchAdQuestionsElementsRemoved;
+    private GameObject2D explosionObject,leftQuestionMark,rightQuestionMark,watchAdIcon,dontWatchAdIcon;
+    private RewardedAd rewardedAd;
+    private Activity activity;
 
-    public GameScreenManager(int screenWidth,int screenHeight,Context context,RelativeLayout layout){
+    public GameScreenManager(int screenWidth,int screenHeight,Context context,RelativeLayout layout,
+                             Activity activity){
         architectureStyle = AppConstants.DARK_WET_BUILDING;
         this.layout = layout;
         this.screenWidth = screenWidth;
@@ -69,17 +79,46 @@ public class GameScreenManager {
         anyMeteorHasHitCityBlock = false;
         explosionTime = 0;
         score = 0;
+        userAlreadyUsedContinue = false;
+        watchAdQuestionSet = false;
+        this.activity = activity;
+        watchAdQuestionsElementsRemoved = false;
 
         city = new City(screenWidth,screenHeight,context);
         secondsPassed = 0;
         timePassedForMeteors = 0;
         currentWave = 0;
 
+        //TEST AD ID
+        rewardedAd = new RewardedAd(context,"ca-app-pub-3940256099942544/5224354917");
+        rewardedAd.loadAd(new AdRequest.Builder().build(),new RewardedAdLoadCallback(){
+            @Override
+            public void onRewardedAdLoaded(){
+                super.onRewardedAdLoaded();
+            }
+        });
+
         // Setting the meteors
         meteors = new ArrayList<Meteor>();
         setMeteorsWaves();
 
         random = new Random();
+    }
+
+    /**
+     * Displays a rewarded ad so the user can keep playing, it also sets the values of the variables
+     * so the game continues to work perfectly after the ad finishes.
+     */
+    public void displayAd(){
+        rewardedAd.show(activity,new RewardedAdCallback(){
+            @Override
+            public void onUserEarnedReward(@NonNull RewardItem rewardItem){
+                explosionTime = 0;
+                anyMeteorHasHitCityBlock = false;
+                userAlreadyUsedContinue = true;
+
+            }
+        });
     }
 
     /**
@@ -90,6 +129,48 @@ public class GameScreenManager {
     }
 
     /**
+     * Removes the elements related to asking user if he/she wants to watch an ad, when the
+     * ad finishes, 10 meteors will be removed so the user can keep playing.
+     * If the number of meteors is less than 10, then all the meteors will be removed.
+     */
+    private void removeQuestionsElementsAndDelete10Meteors(){
+        int numberOfMeteorsToDelete = 10;
+        int meteorsDeleted = 0;
+        if(userAlreadyUsedContinue && !watchAdQuestionsElementsRemoved){
+            layout.removeView(leftQuestionMark);
+            layout.removeView(rightQuestionMark);
+            layout.removeView(watchAdIcon);
+            layout.removeView(dontWatchAdIcon);
+            layout.removeView(explosionObject);
+            explosionObject = null;
+            if(meteors.size() < numberOfMeteorsToDelete){
+                numberOfMeteorsToDelete = meteors.size();
+            }
+            while(meteorsDeleted < numberOfMeteorsToDelete){
+                layout.removeView(meteors.get(0));
+                meteors.remove(0);
+                meteorsDeleted++;
+            }
+            watchAdQuestionsElementsRemoved = true;
+        }
+    }
+
+    /**
+     * Checks if a meteor was killed by the user so it can be removed.
+     */
+    private void checkIfUserKilledAMeteor(){
+        // Checking if user killed the meteor
+        for(int x = 0; x < meteors.size(); x++){
+            if(meteors.get(x).isDeath()){
+                meteors.get(x).setVisibility(View.INVISIBLE);
+                meteors.remove(x);
+                x--;
+                break;
+            }
+        }
+    }
+
+    /**
      * Updates all objects that are active during the game state
      */
     public String update(){
@@ -97,34 +178,27 @@ public class GameScreenManager {
         timePassedForMeteors += AppConstants.DELTA_TIME;
 
         if(!anyMeteorHasHitCityBlock) {
+            removeQuestionsElementsAndDelete10Meteors();
             dispatchMeteors();
             addCityBlock();
-
             // Updating the meteors, making go down down down down
             for(int x = 0; x < meteors.size(); x++){
                 meteors.get(x).update(screenWidth);
             }
-
             checkIfAnyMeteorsHitAnyCityBlock();
+            checkIfUserKilledAMeteor();
 
-            // Checking if user killed the meteor
-            for(int x = 0; x < meteors.size(); x++){
-                if(meteors.get(x).isDeath()){
-                    meteors.get(x).setVisibility(View.INVISIBLE);
-                    meteors.remove(x);
-                    x--;
-                    break;
-                }
-            }
         }else{
             explosionTime += AppConstants.DELTA_TIME;
             if(explosionTime >= TIME_DESIGNATED_FOR_EXPLOSIONS){
-                if(score > Integer.valueOf(highestScore)){
-                    FilesHandler.writeFile(AppConstants.HIGHEST_SCORE_FILE_NAME,
-                            String.valueOf(score),context);
+                if(userAlreadyUsedContinue){
+                    return updateScoreAndResetAssets();
+                }else{
+                    if(!watchAdQuestionSet){
+                        setWatchAdQuestion();
+                        watchAdQuestionSet = true;
+                    }
                 }
-                reset();
-                return AppConstants.GAME_OVER_STATE;
             }
         }
 
@@ -132,6 +206,68 @@ public class GameScreenManager {
     }
 
     public void render(){}
+
+    /**
+     * Initializes the elements to pose a question to the user:
+     * ¿Watch and AD or not?
+     */
+    private void setWatchAdQuestion(){
+        int elementsWidth = screenWidth/4;
+        int elementsHeight = elementsWidth;
+        float elementsYPos = (screenHeight/2)-elementsHeight;
+
+        int[] leftQuestionMarkImages = {R.drawable.left_question_mark};
+        leftQuestionMark = new GameObject2D(context,0,elementsYPos,elementsWidth,
+                elementsHeight,leftQuestionMarkImages);
+
+        int[] dontWatchAdIconImages = {R.drawable.dont_watch_ad_icon};
+        dontWatchAdIcon = new GameObject2D(context,elementsWidth,elementsYPos,elementsWidth,
+                elementsHeight,dontWatchAdIconImages);
+        dontWatchAdIcon.setOnTouchListener(new View.OnTouchListener(){
+            public boolean onTouch(View v,MotionEvent event){
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    userAlreadyUsedContinue = true;
+                }
+
+                return true;
+            }
+        });
+
+        int[] watchAdIconImages = {R.drawable.watch_ad_icon};
+        watchAdIcon = new GameObject2D(context,elementsWidth*2,elementsYPos,elementsWidth,
+                elementsHeight, watchAdIconImages);
+        watchAdIcon.setOnTouchListener(new View.OnTouchListener(){
+            public boolean onTouch(View v,MotionEvent event){
+                if(event.getAction() == MotionEvent.ACTION_DOWN ){
+                    displayAd();
+                }
+
+                return true;
+            }
+        });
+
+        int[] rightQuestionMarkImages = {R.drawable.right_question_mark};
+        rightQuestionMark = new GameObject2D(context,elementsWidth*3,elementsYPos,elementsWidth,
+                elementsHeight, rightQuestionMarkImages);
+
+        layout.addView(leftQuestionMark);
+        layout.addView(dontWatchAdIcon);
+        layout.addView(watchAdIcon);
+        layout.addView(rightQuestionMark);
+    }
+
+    /**
+     * Updates the user's highest score and resets all the game assets freeing memory.
+     * @return - A String containing the next state GAME_OVER_STATE
+     * */
+    private String updateScoreAndResetAssets(){
+        if(score > Integer.valueOf(highestScore)){
+            FilesHandler.writeFile(AppConstants.HIGHEST_SCORE_FILE_NAME,
+                    String.valueOf(score),context);
+        }
+        reset();
+        return AppConstants.GAME_OVER_STATE;
+    }
 
     /**
      * Checks if any meteor hits the top of cityBlocks
@@ -269,6 +405,18 @@ public class GameScreenManager {
         timePassedForMeteors = 0;
         currentWave = 0;
         score = 0;
+        userAlreadyUsedContinue = false;
+        watchAdQuestionSet = false;
+        watchAdQuestionsElementsRemoved = false;
+
+        //TEST AD ID
+        rewardedAd = new RewardedAd(context,"ca-app-pub-3940256099942544/5224354917");
+        rewardedAd.loadAd(new AdRequest.Builder().build(),new RewardedAdLoadCallback(){
+            @Override
+            public void onRewardedAdLoaded(){
+                super.onRewardedAdLoaded();
+            }
+        });
 
         for(int x = 0; x < meteors.size(); x++){
             layout.removeView(meteors.get(x));
@@ -283,6 +431,17 @@ public class GameScreenManager {
         explosionObject = null;
 
         city.reset();
+
+        if(leftQuestionMark != null){
+            layout.removeView(leftQuestionMark);
+            layout.removeView(rightQuestionMark);
+            layout.removeView(watchAdIcon);
+            layout.removeView(dontWatchAdIcon);
+            leftQuestionMark = null;
+            rightQuestionMark = null;
+            watchAdIcon = null;
+            dontWatchAdIcon = null;
+        }
     }
 
     public void setHighestScore(String highestScore){
