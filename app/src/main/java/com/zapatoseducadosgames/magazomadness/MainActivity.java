@@ -16,15 +16,17 @@ import android.widget.TextView;
 import com.zapatoseducadosgames.magazomadness.engine.AppConstants;
 import com.zapatoseducadosgames.magazomadness.engine.FilesHandler;
 import com.zapatoseducadosgames.magazomadness.engine.GameObject2D;
+import com.zapatoseducadosgames.magazomadness.engine.GameOverScreenManager;
 import com.zapatoseducadosgames.magazomadness.engine.GameScreenManager;
 
 public class MainActivity extends AppCompatActivity{
     private RelativeLayout layout;
-    private int screenWidth,screenHeight;
+    private int screenWidth,screenHeight,secondsPassed;
     private GameObject2D magazoMadnessTitle;
     private TextView highestScoreView;
     private String state,highestScoreStr;
     private GameScreenManager gameScreenManager;
+    private GameOverScreenManager gameOverScreenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         layout = findViewById(R.id.relative_layout);
+        secondsPassed = 0;
 
         // Setting the background image
         getWindow().setBackgroundDrawableResource(R.drawable.background);
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity{
 
         // Setting up the managers for each game state
         gameScreenManager = new GameScreenManager(screenWidth,screenHeight,this,layout,this);
+        gameOverScreenManager = new GameOverScreenManager(this,screenWidth,screenHeight,layout);
 
         // Setting up the Title
         int titleWidth = screenWidth-(screenWidth/10);
@@ -84,13 +88,13 @@ public class MainActivity extends AppCompatActivity{
             public void run() {
                 switch(state){
                     case AppConstants.INITIAL_SCREEN_STATE:
+                        secondsPassed += AppConstants.DELTA_TIME;
                     break;
                     case AppConstants.GAME_STATE:
                         state = gameScreenManager.update();
                     break;
-                    case AppConstants.EXPLOSION_STATE:
-                    break;
                     case AppConstants.GAME_OVER_STATE:
+                        gameOverScreenManager.update();
                     break;
                     default:
                         System.out.println("******** There was an error reading the game state " +
@@ -109,8 +113,6 @@ public class MainActivity extends AppCompatActivity{
                     break;
                     case AppConstants.GAME_STATE:
                     break;
-                    case AppConstants.EXPLOSION_STATE:
-                    break;
                     case AppConstants.GAME_OVER_STATE:
                     break;
                     default:
@@ -125,17 +127,25 @@ public class MainActivity extends AppCompatActivity{
     public boolean onTouchEvent(MotionEvent e){
         switch(state){
             case AppConstants.INITIAL_SCREEN_STATE:
-                state = AppConstants.GAME_STATE;
-                magazoMadnessTitle.setVisibility(View.INVISIBLE);
-                highestScoreView.setVisibility(View.INVISIBLE);
-                gameScreenManager.setArchitectureStyle();
-                gameScreenManager.setHighestScore(highestScoreStr);
+                if(secondsPassed >= AppConstants.REQUIRED_SECONDS_FOR_INITIAL_SCREEN_STATE){
+                    state = AppConstants.GAME_STATE;
+                    magazoMadnessTitle.setVisibility(View.INVISIBLE);
+                    highestScoreView.setVisibility(View.INVISIBLE);
+                    layout.removeView(highestScoreView);
+                    gameScreenManager.setArchitectureStyle();
+                    gameScreenManager.setHighestScore(highestScoreStr);
+                    secondsPassed = 0;
+                }
             break;
             case AppConstants.GAME_STATE:
             break;
-            case AppConstants.EXPLOSION_STATE:
-            break;
             case AppConstants.GAME_OVER_STATE:
+                if(gameOverScreenManager.isReadyToGoBackToInitialScreen()){
+                    state = AppConstants.INITIAL_SCREEN_STATE;
+                    magazoMadnessTitle.setVisibility(View.VISIBLE);
+                    setHighestScore();
+                    gameOverScreenManager.reset();
+                }
             break;
             default:
                 System.out.println("******** There was an error reading the game state " +
