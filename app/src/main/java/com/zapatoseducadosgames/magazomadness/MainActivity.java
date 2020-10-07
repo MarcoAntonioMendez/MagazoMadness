@@ -10,6 +10,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity{
     private String state,highestScoreStr;
     private GameScreenManager gameScreenManager;
     private GameOverScreenManager gameOverScreenManager;
+    private Animation scaleAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity{
         int[] images = {R.drawable.magazo_madness_title};
         magazoMadnessTitle = new GameObject2D(this,(screenWidth/2)-(titleWidth/2),
                 (screenHeight/6)*1, titleWidth,titleHeight,images);
+        scaleAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_main_title);
         layout.addView(magazoMadnessTitle);
 
         // Setting the initial state
@@ -68,6 +72,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void startGame(){
+        magazoMadnessTitle.startAnimation(scaleAnimation);
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -129,6 +134,7 @@ public class MainActivity extends AppCompatActivity{
             case AppConstants.INITIAL_SCREEN_STATE:
                 if(secondsPassed >= AppConstants.REQUIRED_SECONDS_FOR_INITIAL_SCREEN_STATE){
                     state = AppConstants.GAME_STATE;
+                    magazoMadnessTitle.clearAnimation();
                     magazoMadnessTitle.setVisibility(View.INVISIBLE);
                     highestScoreView.setVisibility(View.INVISIBLE);
                     layout.removeView(highestScoreView);
@@ -143,6 +149,7 @@ public class MainActivity extends AppCompatActivity{
                 if(gameOverScreenManager.isReadyToGoBackToInitialScreen()){
                     state = AppConstants.INITIAL_SCREEN_STATE;
                     magazoMadnessTitle.setVisibility(View.VISIBLE);
+                    magazoMadnessTitle.startAnimation(scaleAnimation);
                     setHighestScore();
                     gameOverScreenManager.reset();
                 }
