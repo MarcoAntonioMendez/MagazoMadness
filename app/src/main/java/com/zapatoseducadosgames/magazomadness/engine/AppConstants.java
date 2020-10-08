@@ -7,7 +7,7 @@ public class AppConstants {
     public static final int GAME_OVER_IMAGE_ORIGINAL_HEIGHT = 130;
     public static final int DELTA_TIME = 42;
     public static final String HIGHEST_SCORE_FILE_NAME = "HIGHEST_SCORE_FILE_NAME";
-    public static final int HIGHEST_SCORE_TEXT_SIZE = 20;
+    public static final int HIGHEST_SCORE_TEXT_SIZE = 40;
     public static final String HIGHEST_SCORE_TEXT_COLOR = "#b00006";
     public static final int REQUIRED_SECONDS_FOR_INITIAL_SCREEN_STATE = 1000;
     public static final int REQUIRED_SECONDS_FOR_GAME_OVER_SCREEN = 2000;

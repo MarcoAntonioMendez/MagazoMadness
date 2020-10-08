@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity{
     private String state,highestScoreStr;
     private GameScreenManager gameScreenManager;
     private GameOverScreenManager gameOverScreenManager;
-    private Animation scaleAnimation;
+    private Animation scaleAnimation,reverseScaleAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity{
         int[] images = {R.drawable.magazo_madness_title};
         magazoMadnessTitle = new GameObject2D(this,(screenWidth/2)-(titleWidth/2),
                 (screenHeight/6)*1, titleWidth,titleHeight,images);
-        scaleAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_main_title);
+        setAnimations();
         layout.addView(magazoMadnessTitle);
 
         // Setting the initial state
@@ -179,6 +179,49 @@ public class MainActivity extends AppCompatActivity{
         highestScoreView.setY((screenHeight/2)-(highestScoreView.getMeasuredHeight()/2));
 
         layout.addView(highestScoreView);
+    }
+
+    /**
+     * Sets the animations objects that will be used in the magazoMadnessTitle,
+     * The magazoMadnessTitle will grow and shrink constantly.
+     */
+    private void setAnimations(){
+        scaleAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_main_title);
+        scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                magazoMadnessTitle.startAnimation(reverseScaleAnimation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        //
+        reverseScaleAnimation = AnimationUtils.loadAnimation(this,R.anim.reverse_scale_main_title);
+        reverseScaleAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                magazoMadnessTitle.startAnimation(scaleAnimation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
     }
 
     @Override
