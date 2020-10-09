@@ -64,8 +64,10 @@ public class GameScreenManager {
     private Context context;
     private ArrayList<Integer> timeStampsForWave;
     private ArrayList<Meteor> meteors;
-    private boolean anyMeteorHasHitCityBlock,userAlreadyUsedContinue,watchAdQuestionSet,watchAdQuestionsElementsRemoved;
+    private boolean anyMeteorHasHitCityBlock,userAlreadyUsedContinue,watchAdQuestionSet;
+    private boolean watchAdQuestionsElementsRemoved,isGamePaused,pauseGameButtonIsSet;
     private GameObject2D explosionObject,leftQuestionMark,rightQuestionMark,watchAdIcon,dontWatchAdIcon;
+    private GameObject2D pauseButton,playAgainButton;
     private RewardedAd rewardedAd;
     private Activity activity;
 
@@ -83,6 +85,8 @@ public class GameScreenManager {
         watchAdQuestionSet = false;
         this.activity = activity;
         watchAdQuestionsElementsRemoved = false;
+        isGamePaused = false;
+        pauseGameButtonIsSet = false;
 
         city = new City(screenWidth,screenHeight,context);
         secondsPassed = 0;
@@ -101,6 +105,8 @@ public class GameScreenManager {
         // Setting the meteors
         meteors = new ArrayList<Meteor>();
         setMeteorsWaves();
+
+        // Setting the pause button
 
         random = new Random();
     }
@@ -174,29 +180,32 @@ public class GameScreenManager {
      * Updates all objects that are active during the game state
      */
     public String update(){
-        secondsPassed += AppConstants.DELTA_TIME;
-        timePassedForMeteors += AppConstants.DELTA_TIME;
 
-        if(!anyMeteorHasHitCityBlock) {
-            removeQuestionsElementsAndDelete10Meteors();
-            dispatchMeteors();
-            addCityBlock();
-            // Updating the meteors, making go down down down down
-            for(int x = 0; x < meteors.size(); x++){
-                meteors.get(x).update(screenWidth);
-            }
-            checkIfAnyMeteorsHitAnyCityBlock();
-            checkIfUserKilledAMeteor();
+        if(!isGamePaused){
+            secondsPassed += AppConstants.DELTA_TIME;
+            timePassedForMeteors += AppConstants.DELTA_TIME;
+            if(!anyMeteorHasHitCityBlock) {
+                removeQuestionsElementsAndDelete10Meteors();
+                dispatchMeteors();
+                addCityBlock();
+                setPauseGameButton();
+                // Updating the meteors, making go down down down down
+                for(int x = 0; x < meteors.size(); x++){
+                    meteors.get(x).update(screenWidth);
+                }
+                checkIfAnyMeteorsHitAnyCityBlock();
+                checkIfUserKilledAMeteor();
 
-        }else{
-            explosionTime += AppConstants.DELTA_TIME;
-            if(explosionTime >= TIME_DESIGNATED_FOR_EXPLOSIONS){
-                if(userAlreadyUsedContinue){
-                    return updateScoreAndResetAssets();
-                }else{
-                    if(!watchAdQuestionSet){
-                        setWatchAdQuestion();
-                        watchAdQuestionSet = true;
+            }else{
+                explosionTime += AppConstants.DELTA_TIME;
+                if(explosionTime >= TIME_DESIGNATED_FOR_EXPLOSIONS){
+                    if(userAlreadyUsedContinue){
+                        return updateScoreAndResetAssets();
+                    }else{
+                        if(!watchAdQuestionSet){
+                            setWatchAdQuestion();
+                            watchAdQuestionSet = true;
+                        }
                     }
                 }
             }
@@ -408,6 +417,8 @@ public class GameScreenManager {
         userAlreadyUsedContinue = false;
         watchAdQuestionSet = false;
         watchAdQuestionsElementsRemoved = false;
+        isGamePaused = false;
+        pauseGameButtonIsSet = false;
 
         //TEST AD ID
         rewardedAd = new RewardedAd(context,"ca-app-pub-3940256099942544/5224354917");
@@ -418,17 +429,24 @@ public class GameScreenManager {
             }
         });
 
+        // Removing all meteors
         for(int x = 0; x < meteors.size(); x++){
             layout.removeView(meteors.get(x));
         }
         meteors.removeAll(meteors);
 
+        // Removing all the cityBlocks
         for(int x = 0; x < city.getCity().size(); x++){
             layout.removeView(city.getCity().get(x));
         }
 
+        // Removing the explosionObject and the pauseButton and playAgainButton
         layout.removeView(explosionObject);
         explosionObject = null;
+        layout.removeView(pauseButton);
+        pauseButton = null;
+        layout.removeView(playAgainButton);
+        playAgainButton = null;
 
         city.reset();
 
@@ -441,6 +459,60 @@ public class GameScreenManager {
             rightQuestionMark = null;
             watchAdIcon = null;
             dontWatchAdIcon = null;
+        }
+    }
+
+    /**
+     * Creates and adds the pauseButton
+     */
+    private void setPauseGameButton(){
+        if(!pauseGameButtonIsSet){
+            pauseGameButtonIsSet = true;
+            // Setting the pauseButton
+            int pauseButtonWidth = screenWidth/5;
+            int pauseButtonHeight = pauseButtonWidth;
+            int pauseButtonXPos = screenWidth-pauseButtonWidth-AppConstants.PAUSE_BUTTON_OFFSET;
+            int[] pauseButtonImages = {R.drawable.pause_button};
+            pauseButton = new GameObject2D(context,pauseButtonXPos,5,
+                    pauseButtonWidth,pauseButtonHeight,pauseButtonImages);
+
+            pauseButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if(event.getAction() == MotionEvent.ACTION_UP){
+                        if(!anyMeteorHasHitCityBlock){
+                            if(!isGamePaused){
+                                isGamePaused = true;
+                                layout.removeView(pauseButton);
+                                layout.addView(playAgainButton);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+
+            // Setting the plaiAgainButton
+            int[] playButtonImages = {R.drawable.play_button};
+            playAgainButton = new GameObject2D(context,pauseButtonXPos,5,pauseButtonWidth,
+                    pauseButtonHeight,playButtonImages);
+            playAgainButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if(event.getAction() == MotionEvent.ACTION_UP){
+                        if(!anyMeteorHasHitCityBlock){
+                            if(isGamePaused){
+                                isGamePaused = false;
+                                layout.removeView(playAgainButton);
+                                layout.addView(pauseButton);
+                            }
+                        }
+                    }
+                    return true;
+                }
+            });
+
+            layout.addView(pauseButton);
         }
     }
 

@@ -11,6 +11,7 @@ public class AppConstants {
     public static final String HIGHEST_SCORE_TEXT_COLOR = "#b00006";
     public static final int REQUIRED_SECONDS_FOR_INITIAL_SCREEN_STATE = 1000;
     public static final int REQUIRED_SECONDS_FOR_GAME_OVER_SCREEN = 2000;
+    public static final int PAUSE_BUTTON_OFFSET = 10;
 
 
     public static final String INITIAL_SCREEN_STATE = "INITIAL_SCREEN_STATE";
