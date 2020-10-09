@@ -195,7 +195,9 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                magazoMadnessTitle.startAnimation(reverseScaleAnimation);
+                if(state.equals(AppConstants.INITIAL_SCREEN_STATE)){
+                    magazoMadnessTitle.startAnimation(reverseScaleAnimation);
+                }
             }
 
             @Override
@@ -214,7 +216,9 @@ public class MainActivity extends AppCompatActivity{
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                magazoMadnessTitle.startAnimation(scaleAnimation);
+                if(state.equals(AppConstants.INITIAL_SCREEN_STATE)){
+                    magazoMadnessTitle.startAnimation(scaleAnimation);
+                }
             }
 
             @Override
