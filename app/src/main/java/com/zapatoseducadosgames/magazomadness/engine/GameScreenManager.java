@@ -391,9 +391,11 @@ public class GameScreenManager {
         meteor.setOnTouchListener(new View.OnTouchListener(){
             public boolean onTouch(View v,MotionEvent event){
                 if(event.getAction() == MotionEvent.ACTION_DOWN ){
-                    if(!anyMeteorHasHitCityBlock){
-                        score += 1;
-                        meteor.receiveAttack();
+                    if(!isGamePaused){
+                        if(!anyMeteorHasHitCityBlock){
+                            score += 1;
+                            meteor.receiveAttack();
+                        }
                     }
                 }
 
@@ -463,6 +465,32 @@ public class GameScreenManager {
     }
 
     /**
+     * Pauses the game.
+     */
+    public void pauseGame(){
+        if(!anyMeteorHasHitCityBlock){
+            if(!isGamePaused){
+                isGamePaused = true;
+                layout.removeView(pauseButton);
+                layout.addView(playAgainButton);
+            }
+        }
+    }
+
+    /**
+     * Unpauses the game.
+     */
+    private void unpauseGame(){
+        if(!anyMeteorHasHitCityBlock){
+            if(isGamePaused){
+                isGamePaused = false;
+                layout.removeView(playAgainButton);
+                layout.addView(pauseButton);
+            }
+        }
+    }
+
+    /**
      * Creates and adds the pauseButton
      */
     private void setPauseGameButton(){
@@ -480,13 +508,7 @@ public class GameScreenManager {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if(event.getAction() == MotionEvent.ACTION_UP){
-                        if(!anyMeteorHasHitCityBlock){
-                            if(!isGamePaused){
-                                isGamePaused = true;
-                                layout.removeView(pauseButton);
-                                layout.addView(playAgainButton);
-                            }
-                        }
+                        pauseGame();
                     }
                     return true;
                 }
@@ -500,13 +522,7 @@ public class GameScreenManager {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     if(event.getAction() == MotionEvent.ACTION_UP){
-                        if(!anyMeteorHasHitCityBlock){
-                            if(isGamePaused){
-                                isGamePaused = false;
-                                layout.removeView(playAgainButton);
-                                layout.addView(pauseButton);
-                            }
-                        }
+                        unpauseGame();
                     }
                     return true;
                 }

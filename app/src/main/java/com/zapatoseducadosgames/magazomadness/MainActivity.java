@@ -233,9 +233,14 @@ public class MainActivity extends AppCompatActivity{
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {// Windows has focus
             hideSystemUI();
+            if(state.equals(AppConstants.GAME_STATE)){
+
+            }
 
         }else{// Windows does not have focus
-
+            if(state.equals(AppConstants.GAME_STATE)){
+                gameScreenManager.pauseGame();
+            }
         }
     }
 
