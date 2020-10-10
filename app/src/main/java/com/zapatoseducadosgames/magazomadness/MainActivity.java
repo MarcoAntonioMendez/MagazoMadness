@@ -1,35 +1,26 @@
 package com.zapatoseducadosgames.magazomadness;
 
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.zapatoseducadosgames.magazomadness.engine.AppConstants;
-import com.zapatoseducadosgames.magazomadness.engine.FilesHandler;
-import com.zapatoseducadosgames.magazomadness.engine.GameObject2D;
 import com.zapatoseducadosgames.magazomadness.engine.GameOverScreenManager;
 import com.zapatoseducadosgames.magazomadness.engine.GameScreenManager;
+import com.zapatoseducadosgames.magazomadness.engine.InitialScreenState;
 
 public class MainActivity extends AppCompatActivity{
     private RelativeLayout layout;
-    private int screenWidth,screenHeight,secondsPassed;
-    private GameObject2D magazoMadnessTitle;
-    private TextView highestScoreView;
-    private String state,highestScoreStr;
+    private int screenWidth,screenHeight;
+    private String state;
     private GameScreenManager gameScreenManager;
     private GameOverScreenManager gameOverScreenManager;
-    private Animation scaleAnimation,reverseScaleAnimation;
+    private InitialScreenState initialScreenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +28,6 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         layout = findViewById(R.id.relative_layout);
-        secondsPassed = 0;
 
         // Setting the background image
         getWindow().setBackgroundDrawableResource(R.drawable.background);
@@ -51,28 +41,20 @@ public class MainActivity extends AppCompatActivity{
         // Setting up the managers for each game state
         gameScreenManager = new GameScreenManager(screenWidth,screenHeight,this,layout,this);
         gameOverScreenManager = new GameOverScreenManager(this,screenWidth,screenHeight,layout);
-
-        // Setting up the Title
-        int titleWidth = screenWidth-(screenWidth/10);
-        int titleHeight = (titleWidth*AppConstants.TITLE_ORIGINAL_HEIGHT)/AppConstants.TITLE_ORIGINAL_WIDTH;
-        int[] images = {R.drawable.magazo_madness_title};
-        magazoMadnessTitle = new GameObject2D(this,(screenWidth/2)-(titleWidth/2),
-                (screenHeight/6)*1, titleWidth,titleHeight,images);
-        setAnimations();
-        layout.addView(magazoMadnessTitle);
+        initialScreenManager = new InitialScreenState(this,screenWidth,screenHeight,layout);
 
         // Setting the initial state
         state = AppConstants.INITIAL_SCREEN_STATE;
 
         // Set up the files
-        setHighestScore();
+        initialScreenManager.setHighestScore();
 
         hideSystemUI();
         startGame();
     }
 
     private void startGame(){
-        magazoMadnessTitle.startAnimation(scaleAnimation);
+        initialScreenManager.makeMagazoMadnessTitleStartAnimation();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -91,9 +73,10 @@ public class MainActivity extends AppCompatActivity{
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                initialScreenManager.setState(state);
                 switch(state){
                     case AppConstants.INITIAL_SCREEN_STATE:
-                        secondsPassed += AppConstants.DELTA_TIME;
+                        initialScreenManager.updateSecondsPassed();
                     break;
                     case AppConstants.GAME_STATE:
                         state = gameScreenManager.update();
@@ -132,25 +115,17 @@ public class MainActivity extends AppCompatActivity{
     public boolean onTouchEvent(MotionEvent e){
         switch(state){
             case AppConstants.INITIAL_SCREEN_STATE:
-                if(secondsPassed >= AppConstants.REQUIRED_SECONDS_FOR_INITIAL_SCREEN_STATE){
-                    state = AppConstants.GAME_STATE;
-                    magazoMadnessTitle.clearAnimation();
-                    magazoMadnessTitle.setVisibility(View.INVISIBLE);
-                    highestScoreView.setVisibility(View.INVISIBLE);
-                    layout.removeView(highestScoreView);
-                    gameScreenManager.setArchitectureStyle();
-                    gameScreenManager.setHighestScore(highestScoreStr);
-                    secondsPassed = 0;
-                }
+                state = initialScreenManager.checkIfGameCanAlreadyStart();
+                gameScreenManager.setArchitectureStyle();
+                gameScreenManager.setHighestScore(initialScreenManager.getHighestScoreStr());
             break;
             case AppConstants.GAME_STATE:
             break;
             case AppConstants.GAME_OVER_STATE:
                 if(gameOverScreenManager.isReadyToGoBackToInitialScreen()){
                     state = AppConstants.INITIAL_SCREEN_STATE;
-                    magazoMadnessTitle.setVisibility(View.VISIBLE);
-                    magazoMadnessTitle.startAnimation(scaleAnimation);
-                    setHighestScore();
+                    initialScreenManager.makeMagazoMadnessTitleVisible();
+                    initialScreenManager.setHighestScore();
                     gameOverScreenManager.reset();
                 }
             break;
@@ -161,81 +136,11 @@ public class MainActivity extends AppCompatActivity{
         return true;
     }
 
-    private void setHighestScore(){
-        highestScoreStr = FilesHandler.readFile(AppConstants.HIGHEST_SCORE_FILE_NAME,this);
-
-        if(highestScoreStr.isEmpty()){
-            FilesHandler.writeFile(AppConstants.HIGHEST_SCORE_FILE_NAME,"0",this);
-            highestScoreStr = "0";
-        }
-
-        highestScoreView = new TextView(this);
-        highestScoreView.setText(highestScoreStr);
-        highestScoreView.setTypeface(Typeface.SANS_SERIF);
-        highestScoreView.setTextSize(AppConstants.HIGHEST_SCORE_TEXT_SIZE);
-        highestScoreView.setTextColor(Color.parseColor(AppConstants.HIGHEST_SCORE_TEXT_COLOR));
-        highestScoreView.measure(0,0);
-        highestScoreView.setX((screenWidth/2)-(highestScoreView.getMeasuredWidth()/2));
-        highestScoreView.setY((screenHeight/2)-(highestScoreView.getMeasuredHeight()/2));
-
-        layout.addView(highestScoreView);
-    }
-
-    /**
-     * Sets the animations objects that will be used in the magazoMadnessTitle,
-     * The magazoMadnessTitle will grow and shrink constantly.
-     */
-    private void setAnimations(){
-        scaleAnimation = AnimationUtils.loadAnimation(this,R.anim.scale_main_title);
-        scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if(state.equals(AppConstants.INITIAL_SCREEN_STATE)){
-                    magazoMadnessTitle.startAnimation(reverseScaleAnimation);
-                }
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        //
-        reverseScaleAnimation = AnimationUtils.loadAnimation(this,R.anim.reverse_scale_main_title);
-        reverseScaleAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if(state.equals(AppConstants.INITIAL_SCREEN_STATE)){
-                    magazoMadnessTitle.startAnimation(scaleAnimation);
-                }
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-    }
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {// Windows has focus
             hideSystemUI();
-            if(state.equals(AppConstants.GAME_STATE)){
-
-            }
 
         }else{// Windows does not have focus
             if(state.equals(AppConstants.GAME_STATE)){
